@@ -1,52 +1,71 @@
 :-use_module(library(clpfd)).
 
-kenken(N,C,T):-
+kenken_testcase(
+  6,
+  [
+   +(11, [[1|1], [2|1]]),
+   /(2, [1|2], [1|3]),
+   *(20, [[1|4], [2|4]]),
+   *(6, [[1|5], [1|6], [2|6], [3|6]]),
+   -(3, [2|2], [2|3]),
+   /(3, [2|5], [3|5]),
+   *(240, [[3|1], [3|2], [4|1], [4|2]]),
+   *(6, [[3|3], [3|4]]),
+   *(6, [[4|3], [5|3]]),
+   +(7, [[4|4], [5|4], [5|5]]),
+   *(30, [[4|5], [4|6]]),
+   *(6, [[5|1], [5|2]]),
+   +(9, [[5|6], [6|6]]),
+   +(8, [[6|1], [6|2], [6|3]]),
+   /(2, [6|4], [6|5])
+  ]
+).
 
-%predicate to check whether every row and column has numbers 1 to N
-matrix_check(N,List):-
-	length(List,N), fd_domain(List,1,N).
+
+kenken(N,C,T):-
+	length(T,N),fd_domain(T,1,N),apply_constraints(C,T).
 
 %predicate to process all the constraints
-apply_constraints([],List).
-apply_constraints([H|T],List):-constraint(H,List),apply_constraints(T,List).
+apply_constraints([],T).
+apply_constraints([H|Tail],T):-constraint(H,T),apply_constraints(Tail,T).
 
 
-get_entry(R,C,List,E):-
-    nth0(R,List,R_List), nth0(C,R_List,E).
+get_entry(R,C,T,E):-
+    nth0(R,T,R_List), nth0(C,R_List,E).
 
-sum_(+(S,[]),0,List).
-sum_(+(S,[Row-Col|Tail]),T,Sum):-
-	get_entry(Row,Col,List,E),
+sum_(+(S,[]),0,T).
+sum_(+(S,[Row-Col|Tail]),Sum,T):-
+	get_entry(Row,Col,T,E),
 	Sum is Temp_Sum+E,
-	sum_(+(S,Tail),Temp_Sum).
+	sum_(+(S,Tail),Temp_Sum,T).
    
-prod_(*(P,[]),1,List).
-prod_(*(P,[Row-Col|Tail]),Prod,List):-
-	get_entry(Row,Col,List,E),
+prod_(*(P,[]),1,T).
+prod_(*(P,[Row-Col|Tail]),Prod,T):-
+	get_entry(Row,Col,T,E),
 	Prod is Temp_Prod*E,
-	prod_(*(S,Tail),Temp_Prod,List).
+	prod_(*(S,Tail),Temp_Prod,T).
 	
 
-sub_(-(S,Row1-Col1,Row2-Col2),Sub,List):-
-	get_entry(Row1,Col1,List,E1),
-	get_entry(Row2,Col2,List,E2),
+sub_(-(S,Row1-Col1,Row2-Col2),Sub,T):-
+	get_entry(Row1,Col1,T,E1),
+	get_entry(Row2,Col2,T,E2),
 	Sub is E1-E2; Sub is E2-E1.
  
-div_(/(S,Row1-Col1,Row2-Col2),Div,List):-
-	get_entry(Row1,Col1,List,E1),
-	get_entry(Row2,Col2,List,E2),
+div_(/(S,Row1-Col1,Row2-Col2),Div,T):-
+	get_entry(Row1,Col1,T,E1),
+	get_entry(Row2,Col2,T,E2),
 	Div is E1/E2; Div is E2/E1.
 
-constraint(+(S,L),List):-
-	sum_(+(S,L),S,List).
+constraint(+(S,L),T):-
+	sum_(+(S,L),S,T).
 
-constraint(*(S,L),List):-
-	prod_(*(S,L),S,List).
+constraint(*(S,L),T):-
+	prod_(*(S,L),S,T).
 
-constraint(-(S,L1,L2),List):-
-	sub_(-(S,L1,L2),S,List).
+constraint(-(S,L1,L2),T):-
+	sub_(-(S,L1,L2),S,T).
 
-constraint(/(S,L1,L2),List):-
-	div_(/(S,L1,L2),S,List).
+constraint(/(S,L1,L2),T):-
+	div_(/(S,L1,L2),S,T).
 
 
