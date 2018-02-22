@@ -23,7 +23,16 @@ kenken_testcase(
 
 
 kenken(N,C,T):-
-	length(T,N),fd_domain(T,1,N),apply_constraints(C,T).
+	length(T,N),check_row(T,N),
+	transpose(T,T_transpose),check_col(T_transpose,N),
+	fd_domain(T,1,N),fd_labeling(T),apply_constraints(C,T).
+
+check_row([],N).
+check_row([Head|Tail],N):-length(Head,N),fd_domain(Head,1,N),fd_all_different(Head),
+			  check_row(Tail,N).
+
+check_col([],N).
+check_rol([Head|Tail],N):-check_row([Head|Tail],N).
 
 %predicate to process all the constraints
 apply_constraints([],T).
@@ -31,7 +40,7 @@ apply_constraints([H|Tail],T):-constraint(H,T),apply_constraints(Tail,T).
 
 
 get_entry(R,C,T,E):-
-    nth0(R,T,R_List), nth0(C,R_List,E).
+    nth(R,T,R_List), nth(C,R_List,E).
 
 sum_(+(S,[]),0,T).
 sum_(+(S,[Row-Col|Tail]),Sum,T):-
