@@ -42,7 +42,7 @@ kenken(N,C,T):-
 	transpose(T,T_tran),
 	check_cols(N,T_tran),
 	%fd_domain(T,1,N),
-	%apply_constraints(C,T),
+	apply_constraints(C,T),
 	labeling(T).
 
 labeling([]).
@@ -66,27 +66,27 @@ get_entry(R,C,T,E):-
     nth(R,T,R_List), nth(C,R_List,E).
 
 sum_(+(S,[]),0,T).
-sum_(+(S,[Row-Col|Tail]),Sum,T):-
+sum_(+(S,[[Row|Col]|Tail]),Sum,T):-
 	get_entry(Row,Col,T,E),
-	Sum is Temp_Sum+E,
+	Temp_Sum #= Sum-E,
 	sum_(+(S,Tail),Temp_Sum,T).
    
 prod_(*(P,[]),1,T).
-prod_(*(P,[Row-Col|Tail]),Prod,T):-
+prod_(*(P,[[Row|Col]|Tail]),Prod,T):-
 	get_entry(Row,Col,T,E),
-	Prod is Temp_Prod*E,
+	Prod #= Temp_Prod*E,
 	prod_(*(S,Tail),Temp_Prod,T).
 	
 
-sub_(-(S,Row1-Col1,Row2-Col2),Sub,T):-
+sub_(-(S,[Row1|Col1],[Row2|Col2]),Sub,T):-
 	get_entry(Row1,Col1,T,E1),
 	get_entry(Row2,Col2,T,E2),
-	Sub is E1-E2; Sub is E2-E1.
+	Sub #= E1-E2; Sub #= E2-E1.
  
-div_(/(S,Row1-Col1,Row2-Col2),Div,T):-
+div_(/(S,[Row1|Col1],[Row2|Col2]),Div,T):-
 	get_entry(Row1,Col1,T,E1),
 	get_entry(Row2,Col2,T,E2),
-	Div is E1/E2; Div is E2/E1.
+	Div #= E1/E2; Div #= E2/E1.
 
 constraint(+(S,L),T):-
 	sum_(+(S,L),S,T).
