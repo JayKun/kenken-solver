@@ -39,7 +39,6 @@ kenken(N,C,T):-
 	length(T,N),check_rows(N,T),
 	transpose(T,T_tran),
 	check_cols(N,T_tran),
-	%fd_domain(T,1,N),
 	apply_constraints(C,T),
 	labeling(T).
 
@@ -98,4 +97,26 @@ constraint(-(S,L1,L2),T):-
 constraint(/(S,L1,L2),T):-
 	div_(/(S,L1,L2),S,T).
 
+%Plain %kenken
+plain_kenken(N,C,T):- length(T,N),
+		      p_check_rows(N,T),
+		      transpose(T,Trans_T),
+		      p_check_cols(N,Trans_T),
+                      p_apply_constraints(C,T).
 
+p_check_rows(N,[]).
+p_check_rows(N,[Head|Tail]):-length(Head,N),
+			   bagof(X,between(1,N,X),Temp),
+			   permutation(Temp,Head),	   
+			   all_distinct(Head),
+			   p_check_rows(N,Tail).
+
+all_distinct([]).
+all_distinct([H|T]):- \+member(H,T),all_distinct(T). 
+
+p_check_cols(N,[]).
+p_check_cols(N,L):-p_check_rows(N,L).
+
+%predicate to process all the constraints
+p_apply_constraints([],T).
+p_apply_constraints([H|Tail],T):-constraint(H,T),p_apply_constraints(Tail,T).
