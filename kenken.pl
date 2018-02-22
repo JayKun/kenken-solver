@@ -1,5 +1,3 @@
-:-use_module(library(clpfd)).
-
 kenken_testcase(
   6,
   [
