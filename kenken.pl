@@ -22,17 +22,40 @@ kenken_testcase(
 ).
 
 
+% Transpose function
+transpose([], []).
+transpose([F|Fs], Ts) :-
+    transpose(F, [F|Fs], Ts).
+
+transpose([], _, []).
+transpose([_|Rs], Ms, [Ts|Tss]) :-
+        lists_firsts_rests(Ms, Ts, Ms1),
+        transpose(Rs, Ms1, Tss).
+
+lists_firsts_rests([], [], []).
+lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
+        lists_firsts_rests(Rest, Fs, Oss).
+
+% kenken solver
 kenken(N,C,T):-
-	length(T,N),check_row(T,N),
-	transpose(T,T_transpose),check_col(T_transpose,N),
-	fd_domain(T,1,N),fd_labeling(T),apply_constraints(C,T).
+	length(T,N),check_rows(N,T),
+	transpose(T,T_tran),
+	check_cols(N,T_tran),
+	%fd_domain(T,1,N),
+	%apply_constraints(C,T),
+	labeling(T).
 
-check_row([],N).
-check_row([Head|Tail],N):-length(Head,N),fd_domain(Head,1,N),fd_all_different(Head),
-			  check_row(Tail,N).
+labeling([]).
+labeling([Head|Tail]):-fd_labeling(Head), labeling(Tail).
 
-check_col([],N).
-check_rol([Head|Tail],N):-check_row([Head|Tail],N).
+check_rows(N,[]).
+check_rows(N,[Head|Tail]):-length(Head,N),
+			   fd_domain(Head,1,N),
+			   fd_all_different(Head),
+			   check_rows(N,Tail).
+
+check_cols(N,[]).
+check_cols(N,L):-check_rows(N,L).
 
 %predicate to process all the constraints
 apply_constraints([],T).
