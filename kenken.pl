@@ -16,42 +16,42 @@ lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
 labeling([]).
 labeling([Head|Tail]):-fd_labeling(Head), labeling(Tail).
 
-check_rows(N,[]).
+check_rows(_,[]).
 check_rows(N,[Head|Tail]):-length(Head,N),
 			   fd_domain(Head,1,N),
 			   fd_all_different(Head),
 			   check_rows(N,Tail).
 
-check_cols(N,[]).
+check_cols(_,[]).
 check_cols(N,L):-check_rows(N,L).
 
 %predicate to process all the constraints
-apply_constraints([],T).
+apply_constraints([],_).
 apply_constraints([H|Tail],T):-constraint(H,T),apply_constraints(Tail,T).
 
 
 get_entry(R,C,T,E):-
     nth(R,T,R_List), nth(C,R_List,E).
 
-sum_(+(S,[]),0,T).
+sum_(+(_,[]),0,_).
 sum_(+(S,[[Row|Col]|Tail]),Sum,T):-
 	get_entry(Row,Col,T,E),
 	sum_(+(S,Tail),Temp_Sum,T),
 	Temp_Sum #= Sum-E.
    
-prod_(*(P,[]),1,T).
-prod_(*(P,[[Row|Col]|Tail]),Prod,T):-
+prod_(*(_,[]),1,_).
+prod_(*(_,[[Row|Col]|Tail]),Prod,T):-
 	get_entry(Row,Col,T,E),
-	prod_(*(S,Tail),Temp_Prod,T),
+	prod_(*(_,Tail),Temp_Prod,T),
 	Prod #= Temp_Prod*E.
 	
 
-sub_(-(S,[Row1|Col1],[Row2|Col2]),Sub,T):-
+sub_(-(_,[Row1|Col1],[Row2|Col2]),Sub,T):-
 	get_entry(Row1,Col1,T,E1),
 	get_entry(Row2,Col2,T,E2),
 	(Sub #= E1-E2; Sub #= E2-E1).
  
-div_(/(S,[Row1|Col1],[Row2|Col2]),Div,T):-
+div_(/(_,[Row1|Col1],[Row2|Col2]),Div,T):-
 	get_entry(Row1,Col1,T,E1),
 	get_entry(Row2,Col2,T,E2),
 	(Div #= E1/E2; Div #= E2/E1).
@@ -96,8 +96,6 @@ kenken(N,C,T):-
 	apply_constraints(C,T),
 	labeling(T).
 
-
-
 %Plain %kenken
 plain_kenken(N,C,T):- length(T,N),
 		      p_check_rows(N,T),
@@ -105,7 +103,7 @@ plain_kenken(N,C,T):- length(T,N),
 		      p_check_cols(N,Trans_T),
                       p_apply_constraints(C,T).
 
-p_check_rows(N,[]).
+p_check_rows(_,[]).
 p_check_rows(N,[Head|Tail]):-length(Head,N),
 			   bagof(X,between(1,N,X),Temp),
 			   permutation(Temp,Head),	   
@@ -115,9 +113,9 @@ p_check_rows(N,[Head|Tail]):-length(Head,N),
 all_distinct([]).
 all_distinct([H|T]):- \+member(H,T),all_distinct(T). 
 
-p_check_cols(N,[]).
+p_check_cols(_,[]).
 p_check_cols(N,L):-p_check_rows(N,L).
 
 %predicate %to %process %all %the %constraints
-p_apply_constraints([],T).
+p_apply_constraints([],_).
 p_apply_constraints([H|Tail],T):-constraint(H,T),p_apply_constraints(Tail,T).
