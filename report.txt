@@ -1,4 +1,4 @@
-%testcase for performance test
+%Testcase for performance test
 N = 4,
 C = [
    +(6, [[1|1], [1|2], [2|1]]),
@@ -9,8 +9,41 @@ C = [
    *(2, [[3|4]])
   ],
 
-%the solvers are invoked as follows:
-kenken(N,C,T), write(T), nl, statistics.
-plain_kenken(N,C,T), write(T), nl, statistics.
+%The solvers are invoked as follows:
+kenken_testcase_y(N,C),kenken(N,C,T),statistics.
+kenken_testcase_1(N,C),plain_kenken(N,C,T),statistics.
+
+%Results:
+kenken\3:
+Memory               limit         in use            free
+
+   trail  stack      16383 Kb            5 Kb        16378 Kb
+   cstr   stack      16383 Kb            9 Kb        16374 Kb
+   global stack      32767 Kb            4 Kb        32763 Kb
+   local  stack      16383 Kb            3 Kb        16380 Kb
+   atom   table      32768 atoms      1787 atoms     30981 atoms
+
+Times              since start      since last
+
+   user   time       0.031 sec       0.031 sec
+   system time       0.031 sec       0.031 sec
+   cpu    time       0.062 sec       0.062 sec
+   real   time      24.470 sec      24.470 sec
 
 
+
+plain_kenken\3:
+Memory               limit         in use            free
+
+   trail  stack      16383 Kb            0 Kb        16383 Kb
+   cstr   stack      16384 Kb            0 Kb        16384 Kb
+   global stack      32767 Kb            7 Kb        32760 Kb
+   local  stack      16383 Kb            8 Kb        16375 Kb
+   atom   table      32768 atoms      1787 atoms     30981 atoms
+
+Times              since start      since last
+
+   user   time       0.046 sec       0.046 sec
+   system time       0.062 sec       0.062 sec
+   cpu    time       0.108 sec       0.108 sec
+   real   time      30.609 sec      30.609 sec

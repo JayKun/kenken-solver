@@ -1,17 +1,15 @@
+% Transpose Function
+transpose([],_,_,_).
+transpose([H1|T1],Trans,R,N):- 
+                                  length(Trans,N),
+                                  set_entries(Trans,H1,R,N),
+			          T_R #= R+1,
+			          transpose(T1,Trans,T_R,N).
+set_entries(_,[],_,_).
+set_entries([H_Trans|T_Trans],[H|T],C,N):-length(H_Trans,N),
+					  nth(C,H_Trans,H),
+                                          set_entries(T_Trans,T,C,N).
 
-% Transpose function
-transpose([], []).
-transpose([F|Fs], Ts) :-
-    transpose(F, [F|Fs], Ts).
-
-transpose([], _, []).
-transpose([_|Rs], Ms, [Ts|Tss]) :-
-        lists_firsts_rests(Ms, Ts, Ms1),
-        transpose(Rs, Ms1, Tss).
-
-lists_firsts_rests([], [], []).
-lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
-        lists_firsts_rests(Rest, Fs, Oss).
 
 labeling([]).
 labeling([Head|Tail]):-fd_labeling(Head), labeling(Tail).
@@ -68,6 +66,37 @@ constraint(-(S,L1,L2),T):-
 constraint(/(S,L1,L2),T):-
 	div_(/(S,L1,L2),S,T).
 
+kenken(N,C,T):-
+	length(T,N),check_rows(N,T),
+	transpose(T,T_tran,1,N),
+	check_cols(N,T_tran),
+	apply_constraints(C,T),
+	labeling(T).
+
+%Plain %kenken
+plain_kenken(N,C,T):- length(T,N),
+		      p_check_rows(N,T),
+		      transpose(T,Trans_T,1,N),
+		      p_check_cols(N,Trans_T),
+                      p_apply_constraints(C,T).
+
+p_check_rows(_,[]).
+p_check_rows(N,[Head|Tail]):-length(Head,N),
+			   bagof(X,between(1,N,X),Temp),
+			   permutation(Temp,Head),	   
+			   all_distinct(Head),
+			   p_check_rows(N,Tail).
+
+all_distinct([]).
+all_distinct([H|T]):- \+member(H,T),all_distinct(T). 
+
+p_check_cols(_,[]).
+p_check_cols(N,L):-p_check_rows(N,L).
+
+%predicate %to %process %all %the %constraints
+p_apply_constraints([],_).
+p_apply_constraints([H|Tail],T):-constraint(H,T),p_apply_constraints(Tail,T).
+
 kenken_testcase(
   6,
   [
@@ -89,33 +118,14 @@ kenken_testcase(
   ]
 ).
 
-kenken(N,C,T):-
-	length(T,N),check_rows(N,T),
-	transpose(T,T_tran),
-	check_cols(N,T_tran),
-	apply_constraints(C,T),
-	labeling(T).
-
-%Plain %kenken
-plain_kenken(N,C,T):- length(T,N),
-		      p_check_rows(N,T),
-		      transpose(T,Trans_T),
-		      p_check_cols(N,Trans_T),
-                      p_apply_constraints(C,T).
-
-p_check_rows(_,[]).
-p_check_rows(N,[Head|Tail]):-length(Head,N),
-			   bagof(X,between(1,N,X),Temp),
-			   permutation(Temp,Head),	   
-			   all_distinct(Head),
-			   p_check_rows(N,Tail).
-
-all_distinct([]).
-all_distinct([H|T]):- \+member(H,T),all_distinct(T). 
-
-p_check_cols(_,[]).
-p_check_cols(N,L):-p_check_rows(N,L).
-
-%predicate %to %process %all %the %constraints
-p_apply_constraints([],_).
-p_apply_constraints([H|Tail],T):-constraint(H,T),p_apply_constraints(Tail,T).
+kenken_testcase_1(
+  4,
+  [
+   +(6, [[1|1], [1|2], [2|1]]),
+   *(96, [[1|3], [1|4], [2|2], [2|3], [2|4]]),
+   -(1, [3|1], [3|2]),
+   -(1, [4|1], [4|2]),
+   +(8, [[3|3], [4|3], [4|4]]),
+   *(2, [[3|4]])
+  ]
+).
