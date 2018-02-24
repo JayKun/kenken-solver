@@ -13,6 +13,9 @@ C = [
 The solvers are invoked as follows:
 statistics(cpu_time, [Start|_])kenken_testcase_1(N,C),kenken(N,C,T),statistics(cpu_time, [Stop|_]).
 statistics(cpu_time, [Start|_])kenken_testcase_1(N,C),plain_kenken(N,C,T),statistics(cpu_time, [Stop|_]).
+We invoke these two queries by changing cpu_time to compare stack
+usage, system_time and user_time to obtain the results below.
+The actual time taken is calculated by subtracting Start from Stop.
 
 Results:
 kenken\3 performed much better than plain_kenken\3 
